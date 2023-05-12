@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "project-barcode-to-img"
+version = "0.1.0"
+description = "Project to recognize a barcode from a camera"
+authors = ["gustavoDwsantos <gustavos200116@gmail.com>"]
+readme = "README.md"
+packages = [{include = "project_barcode_to_img"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
