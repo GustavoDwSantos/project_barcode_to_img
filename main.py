@@ -1,30 +1,50 @@
 from tkinter import *
 from PIL import Image, ImageTk
 import cv2
+import numpy as np
+import requests
+  
 
+#Window setting
 root = Tk()
 root.title("Barcode Reader")
-root.geometry("800x600")
+root.geometry("1400x800")
 root.resizable(False, False)
 
-button = Button(root, text="Scan")
-# button.grid(row=0, column=1)
-button.pack()
 
+
+#cam IP config
+url = "http://192.168.0.102:8080/shot.jpg"
 label = Label(root)
-# label.grid(row=0, column=0)
 label.pack()
-cap = cv2.VideoCapture(0)
+
+
+
 
 def show_frames():
-    cv2imagem = cv2.cvtColor(cap.read()[1], cv2.COLOR_BGR2RGB)
+    img_resp = requests.get(url)
+    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
+    img = cv2.imdecode(img_arr, -1)
+    cv2imagem = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = Image.fromarray(cv2imagem)
-
     imgtk = ImageTk.PhotoImage(image=img)
     label.imgtk = imgtk
     label.configure(image=imgtk)
 
     label.after(10, show_frames)
+
+
+#Button Setting
+def Scan():
+    img_resp = requests.get(url)
+    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
+    img = cv2.imdecode(img_arr, -1)
+    cv2imagem = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+
+button = Button(root, text="Scan", command=Scan)
+# button.grid(row=0, column=1)
+button.pack()
 
 show_frames()
 root.mainloop()
