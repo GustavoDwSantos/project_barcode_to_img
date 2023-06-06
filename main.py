@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 import cv2
 import numpy as np
 
-from img_url2cv2 import url2cv2
+from img_url2cv2 import url2img
   
 #Window setting
 root = Tk()
@@ -18,7 +18,7 @@ label.pack()
 
 #show frames camera
 def show_frames():
-    cv2imagem = url2cv2(url)
+    cv2imagem = url2img(url)
     img = Image.fromarray(cv2imagem)
     imgtk = ImageTk.PhotoImage(image=img)
     label.imgtk = imgtk
@@ -28,7 +28,7 @@ def show_frames():
 
 #Button comand
 def Scan():
-    cv2imagem = url2cv2(url)
+    cv2imagem = url2img(url)
 
 #Button Setting
 button = Button(root, text="Scan", command=Scan)
