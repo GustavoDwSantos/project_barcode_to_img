@@ -8,13 +8,17 @@ from img_url2cv2 import url2img
 #Window setting
 root = Tk()
 root.title("Barcode Reader")
-root.geometry("1400x800")
-root.resizable(False, False)
+root.geometry("1350x800")
+root.resizable(True, True)
 
 #cam IP config
-url = "http://192.168.0.102:8080/shot.jpg"
+url = "http://192.168.0.100:8080/shot.jpg"
 label = Label(root)
-label.pack()
+label.pack(side=LEFT)
+
+
+image_return = Label(root)
+image_return.pack(side=RIGHT)
 
 #show frames camera
 def show_frames():
@@ -28,13 +32,20 @@ def show_frames():
 
 #Button comand
 def Scan():
-    cv2imagem = url2img(url)
+    img = url2img(url)
+    img = Image.fromarray(img)
+    imgtk = ImageTk.PhotoImage(image=img)
+    image_return.imgtk = imgtk
+    image_return.configure(image=imgtk)
+
+
 
 #Button Setting
 button = Button(root, text="Scan", command=Scan)
 # button.grid(row=0, column=1)
-button.pack()
+button.pack(side=BOTTOM)
 
+Scan()
 show_frames()
 root.mainloop()
 
