@@ -1,6 +1,7 @@
 import pytesseract as tess
 import cv2
 from pytesseract import Output
+from pyzbar.pyzbar import decode, ZBarSymbol
 
 
 def img_dict(img):
@@ -19,4 +20,8 @@ def caixa_texto(dict_img, img ,cor = (225, 100, 0)):
 
   return x, y, img
 
+def barcode_reader_img(etq):  
+  data = decode(etq, symbols=ZBarSymbol.CODE93)
+
+  return data[0][0]
 
