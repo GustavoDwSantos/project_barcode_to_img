@@ -57,10 +57,17 @@ class ScanFrame(Frame):
     
     def show_frames(self):
         cv2imagem = url2img(self.url)
-        img = Image.fromarray(cv2imagem)
-        imgtk = ImageTk.PhotoImage(image=img)
-        self.label_cam.imgtk = imgtk
-        self.label_cam.configure(image=imgtk)
+        img_box = caixa_texto(cv2imagem)
+        if len(img_box) > 0:
+            img = Image.fromarray(img_box)
+            imgtk = ImageTk.PhotoImage(image=img)
+            self.label_cam.imgtk = imgtk
+            self.label_cam.configure(image=imgtk)
+        else:
+            img = Image.fromarray(cv2imagem)
+            imgtk = ImageTk.PhotoImage(image=img)
+            self.label_cam.imgtk = imgtk
+            self.label_cam.configure(image=imgtk)
 
         self.label_cam.after(10, self.show_frames)
     
