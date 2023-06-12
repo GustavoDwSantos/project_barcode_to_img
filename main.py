@@ -2,6 +2,8 @@ from tkinter import *
 from PIL import Image, ImageTk
 import cv2
 import numpy as np
+from img_analyzer import barcode_reader_img, caixa_texto
+from img_cutter import img2etq
 
 from img_url2cv2 import url2img
   
@@ -63,12 +65,12 @@ class ScanFrame(Frame):
         self.label_cam.after(10, self.show_frames)
     
     def Scan(self):
-        pass
-        """img = url2img(self.url)
-        img = Image.fromarray(img)
-        imgtk = ImageTk.PhotoImage(image=img)
-        self.image_return.imgtk = imgtk
-        self.image_return.configure(image=imgtk)"""
+        img = url2img(self.url)
+        etq = img2etq(img)
+        barcode = barcode_reader_img(etq)
+        print(barcode)
+        self.pkg_var.set(barcode)
+        
 
 class App(Tk):
     def __init__(self):

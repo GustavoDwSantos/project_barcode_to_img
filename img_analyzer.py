@@ -17,11 +17,12 @@ def caixa_texto(dict_img, img ,cor = (225, 100, 0)):
   h = dict_img['height'][i]
  
   cv2.rectangle(img,(x,y), (x+w ,y + h), cor , 2 )
-
+  
   return x, y, img
 
 def barcode_reader_img(etq):  
-  data = decode(etq, symbols=ZBarSymbol.CODE93)
-
-  return data[0][0]
+  data = decode(etq, symbols=ZBarSymbol)
+  if len(data) > 0:
+    return data[0][0]
+  else:pass
 
