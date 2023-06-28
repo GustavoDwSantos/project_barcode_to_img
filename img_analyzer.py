@@ -8,7 +8,7 @@ from pre_processing import aplica_masc
 
 
 def img_dict(img):
-    config_tesseract = "--tessdata-dir tessdata --psm 3"
+    config_tesseract = "--tessdata-dir tessdata --psm 8"
     dict_img = tess.image_to_data(img, output_type=Output.DICT, lang='por', config=config_tesseract)
     return dict_img
 

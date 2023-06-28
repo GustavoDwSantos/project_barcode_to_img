@@ -39,3 +39,21 @@ def etqextractbarcode(img):
     limiarizacao = cv2.dilate(limiarizacao, kernel_quad, iterations = 3)
     barcode, planilha = img2recorte_barcode(calcula_contornos(limiarizacao), etq, 0.1, 0.9)
     return barcode ,planilha
+
+def cutline2etq(etq, propy, propx):
+    eixo_y = int(etq.shape[0] * propy)
+    eixo_x = int(etq.shape[1] * propx)
+    largura = int(eixo_x*2.8)
+    altura = int(eixo_y+ eixo_x/1.5)
+    data = etq[eixo_y:altura, eixo_x:largura]
+    return data
+
+def cutdata2etq(etq):
+    info = {"lote": "", "nom_wt": "", "units": "", "net": "", "grade": "" ,"set": "", "pkg": ""}
+    i = 0
+    for data in info:
+        
+        info[data] = cutline2etq(etq, 0.20+i*0.07, 0.25)
+        i += 1.1
+        print(i)
+    return info
