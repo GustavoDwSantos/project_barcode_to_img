@@ -51,7 +51,13 @@ def aplica_masc(img,kernel_tuple):
 
     return limiarizacao
 
-        
+def upscale_x4(img):
+    upscale = cv2.dnn_superres.DnnSuperResImpl_create()
+    path = "EDSR_x4.pb"
+    upscale.readModel(path)
+    upscale.serModel("edsr", 4)
+    img_x4 = upscale.upsample(img)
+    return img_x4
 
 
 

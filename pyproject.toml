@@ -9,12 +9,12 @@ packages = [{include = "project_barcode_to_img"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 pillow = "^9.5.0"
-opencv-python = "^4.7.0.72"
 requests = "^2.31.0"
 pytesseract = "^0.3.10"
 scikit-image = "^0.21.0"
 pyzbar = {extras = ["scripts"], version = "^0.1.9"}
 matplotlib = "^3.7.1"
+opencv-contrib-python = "^4.8.0.74"
 
 
 [tool.poetry.group.dev.dependencies]
