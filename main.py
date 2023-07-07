@@ -2,11 +2,51 @@ from tkinter import *
 from PIL import Image, ImageTk
 import cv2
 import numpy as np
-from img_analyzer import barcode_reader_img, caixa_texto
-from img_cutter import img2etq
+from img_analyzer import *
+from img_cutter import *
 
-from img_url2cv2 import url2img
+from img_url2cv2 import *
+from pre_processing import *
   
+class EtqFounder(Frame):
+
+    def __init__(self, master, img):
+        super().__init__(master)
+        
+        options = {'padx': 5, 'pady': 5}
+
+        self.img = img
+        self.img = cv2.resize(self.img, (0,0), fx=0.5, fy=0.5)
+        self.img = Image.fromarray(self.img)
+        self.img = ImageTk.PhotoImage(image=self.img)
+        self.label_img = Label(self, image=self.img)
+        self.label_img.grid(row=0, column=0, **options)
+
+        self.label_message = Label(self, text="Imagem Encontrada, deseja fazer o processo de OCR?")
+        self.label_message.grid(row=1, column=0, columnspan= 2, **options)
+
+        self.button_yes = Button(self, text="Sim", command=self.yes)
+        self.button_yes.grid(row=2, column=0,**options)
+
+        self.button_no = Button(self, text="Não", command=self.no)
+        self.button_no.grid(row=2, column=1, **options)
+
+        self.ocr = False
+
+        self.grid(padx=10, pady=10, sticky=NSEW)
+
+    def img_set(self, img):
+        
+        self.img = img
+
+    def yes(self):
+        self.ocr = True
+        self.master.destroy()
+
+    def no(self):
+        self.ocr = False
+        self.master.destroy()
+
 
 
 class ScanFrame(Frame):
@@ -48,7 +88,7 @@ class ScanFrame(Frame):
             self.entry.grid(row=i+1, column=2, **options)
 
         #Button Setting
-        self.button = Button(self, text="Scan", command=self.Scan)
+        self.button = Button(self, text="Scan", command=self.scan)
         self.button.grid(row=7, column=1, columnspan=2, **options)
 
         self.show_frames()
@@ -71,13 +111,35 @@ class ScanFrame(Frame):
 
         self.label_cam.after(10, self.show_frames)
     
-    def Scan(self):
+    def process_image_line(self ,dict_img, key, variable, kernel):
+        
+        img = upscale_x4(dict_img[key])
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        limiar = limiar_otsu(gray)
+        fechamento = cv2.morphologyEx(limiar, cv2.MORPH_CLOSE, kernel)
+        data = img_dict(fechamento)
+
+        for string in data['text']:
+            if string and len(string) > len(variable.get()):
+                variable.set(string)
+
+
+    def scan(self):
         img = url2img(self.url)
         etq = img2etq(img)
-        barcode = barcode_reader_img(etq)
-        print(barcode)
-        self.pkg_var.set(barcode)
-        
+        app2 = Message()
+        frame2 = EtqFounder(app2, etq)
+        app2.mainloop()
+
+        if frame2.ocr:
+            dict_img = cutdata2etq(etq)
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,7))
+            self.process_image_line(dict_img, "lote", self.lote_var, kernel)
+            self.process_image_line(dict_img, "nom_wt", self.nom_wt_var, kernel)
+            self.process_image_line(dict_img, "units", self.units_var, kernel)
+            self.process_image_line(dict_img, "net", self.net_var, kernel)
+            self.process_image_line(dict_img, "set", self.set_var, kernel)
+            self.process_image_line(dict_img, "pkg", self.pkg_var, kernel)
 
 class App(Tk):
     def __init__(self):
@@ -86,6 +148,14 @@ class App(Tk):
         self.title("Barcode Reader")
         self.geometry("900x560")
         self.resizable(True, True)
+
+class Message(Toplevel):
+    def __init__(self):
+        super().__init__()
+
+        self.title("Etiqueta Encontrada")
+        self.geometry("400x600")
+        self.resizable(False, False)
 
 
 if __name__ == "__main__":

@@ -55,5 +55,4 @@ def cutdata2etq(etq):
         
         info[data] = cutline2etq(etq, 0.20+i*0.07, 0.25)
         i += 1.1
-        print(i)
     return info
