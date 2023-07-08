@@ -10,16 +10,16 @@ from pre_processing import *
   
 class EtqFounder(Frame):
 
-    def __init__(self, master, img):
+    def __init__(self, master, scanframe, img):
         super().__init__(master)
         
         options = {'padx': 5, 'pady': 5}
 
         self.img = img
-        self.img = cv2.resize(self.img, (0,0), fx=0.5, fy=0.5)
-        self.img = Image.fromarray(self.img)
-        self.img = ImageTk.PhotoImage(image=self.img)
-        self.label_img = Label(self, image=self.img)
+        self.img_resize = cv2.resize(self.img, (0,0), fx=0.5, fy=0.5)
+        self.img_resize = Image.fromarray(self.img_resize)
+        self.img_resize = ImageTk.PhotoImage(image=self.img_resize)
+        self.label_img = Label(self, image =self.img_resize)
         self.label_img.grid(row=0, column=0, **options)
 
         self.label_message = Label(self, text="Imagem Encontrada, deseja fazer o processo de OCR?")
@@ -31,16 +31,21 @@ class EtqFounder(Frame):
         self.button_no = Button(self, text="Não", command=self.no)
         self.button_no.grid(row=2, column=1, **options)
 
-        self.ocr = False
+        self.scanframe = scanframe
 
         self.grid(padx=10, pady=10, sticky=NSEW)
 
-    def img_set(self, img):
         
-        self.img = img
 
     def yes(self):
-        self.ocr = True
+        dict_img = cutdata2etq(self.img)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,5))
+        self.scanframe.process_image_line(dict_img, "lote", self.scanframe.lote_var, kernel)
+        self.scanframe.process_image_line(dict_img, "nom_wt", self.scanframe.nom_wt_var, kernel)
+        self.scanframe.process_image_line(dict_img, "units", self.scanframe.units_var, kernel)
+        self.scanframe.process_image_line(dict_img, "net", self.scanframe.net_var, kernel)
+        self.scanframe.process_image_line(dict_img, "set", self.scanframe.set_var, kernel)
+        self.scanframe.process_image_line(dict_img, "pkg", self.scanframe.pkg_var, kernel)
         self.master.destroy()
 
     def no(self):
@@ -128,18 +133,8 @@ class ScanFrame(Frame):
         img = url2img(self.url)
         etq = img2etq(img)
         app2 = Message()
-        frame2 = EtqFounder(app2, etq)
+        frame2 = EtqFounder(app2, self, etq)
         app2.mainloop()
-
-        if frame2.ocr:
-            dict_img = cutdata2etq(etq)
-            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1,7))
-            self.process_image_line(dict_img, "lote", self.lote_var, kernel)
-            self.process_image_line(dict_img, "nom_wt", self.nom_wt_var, kernel)
-            self.process_image_line(dict_img, "units", self.units_var, kernel)
-            self.process_image_line(dict_img, "net", self.net_var, kernel)
-            self.process_image_line(dict_img, "set", self.set_var, kernel)
-            self.process_image_line(dict_img, "pkg", self.pkg_var, kernel)
 
 class App(Tk):
     def __init__(self):
